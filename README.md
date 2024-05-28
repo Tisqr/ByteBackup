@@ -1,2 +1,1 @@
-# ByteBackup
-A Simple File Backup Software For Windows.
+A Simple File Backup Utility.
