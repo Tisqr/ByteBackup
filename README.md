@@ -1,1 +1,1 @@
-A Simple File Backup Utility.
+A simple file backup utility.
