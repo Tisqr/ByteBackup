@@ -1,10 +1,8 @@
 {
   "name": "bytebackup",
   "version": "1.0.0",
-  "description": "An Electron application with React",
+  "description": "A Simple File Backup Utility.",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
