@@ -1,33 +1,54 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { useState } from 'react'
+import Header from './components/Header'
+import TreeList from './components/GroupsList'
+import DataTable from './components/DataTable'
+import './assets/App.css'
+
+const ListDataSource = [
+  'Racing car sprays burning fuel into crowd.',
+  'Japanese princess to wed commoner.',
+  'Australian walks 100km after outback crash.',
+  'Man charged over missing wedding girl.',
+  'Los Angeles battles huge wildfires.'
+]
+
+const TableDataSource = Array.from({ length: 20 }, (_, i) => ({
+  key: `${i + 1}`,
+  name: `Name ${i + 1}`,
+  age: 20 + (i % 30),
+  address: `Address ${i + 1}`
+}))
 
 function App() {
-  const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+  const [dataSource, setDataSource] = useState(TableDataSource)
+  const [loading, setLoading] = useState(false)
+
+  const loadMoreData = () => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
+    // Simulate a fetch request
+    setTimeout(() => {
+      const newItems = Array.from({ length: 20 }, (_, i) => ({
+        key: `${dataSource.length + i + 1}`,
+        name: `Name ${dataSource.length + i + 1}`,
+        age: 20 + ((dataSource.length + i) % 30),
+        address: `Address ${dataSource.length + i + 1}`
+      }))
+      setDataSource([...dataSource, ...newItems])
+      setLoading(false)
+    }, 1500)
+  }
 
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
+    <div className="app-container">
+      <Header />
+      <div className="content">
+        <TreeList data={ListDataSource} />
+        <DataTable dataSource={dataSource} loadMoreData={loadMoreData} />
       </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
+    </div>
   )
 }
 
