@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import Header from './components/Header'
-import TreeList from './components/GroupsList'
 import DataTable from './components/DataTable'
+import GroupsList from './components/GroupsList'
+import copyFile from './components/copyFile'
+import { Tabs } from 'antd'
 import './assets/App.css'
 
 const ListDataSource = [
@@ -12,41 +15,46 @@ const ListDataSource = [
   'Los Angeles battles huge wildfires.'
 ]
 
-const TableDataSource = Array.from({ length: 20 }, (_, i) => ({
-  key: `${i + 1}`,
-  name: `Name ${i + 1}`,
-  age: 20 + (i % 30),
-  address: `Address ${i + 1}`
-}))
+const TableDataSource = [
+  {
+    key: '1',
+    path: 'test'
+  }
+]
 
 function App() {
   const [dataSource, setDataSource] = useState(TableDataSource)
-  const [loading, setLoading] = useState(false)
+  var BackupLoc = 'test'
 
-  const loadMoreData = () => {
-    if (loading) {
-      return
+  const handleCopy = async () => {
+    for (const path of dataSource) {
+      var temp = path.path.split('/').slice(-1).pop()
+      await copyFile(path.path, BackupLoc + temp)
     }
-    setLoading(true)
-    // Simulate a fetch request
-    setTimeout(() => {
-      const newItems = Array.from({ length: 20 }, (_, i) => ({
-        key: `${dataSource.length + i + 1}`,
-        name: `Name ${dataSource.length + i + 1}`,
-        age: 20 + ((dataSource.length + i) % 30),
-        address: `Address ${dataSource.length + i + 1}`
-      }))
-      setDataSource([...dataSource, ...newItems])
-      setLoading(false)
-    }, 1500)
   }
+
+  handleCopy()
 
   return (
     <div className="app-container">
-      <Header />
+      <Header BackupLoc={BackupLoc} />
       <div className="content">
-        <TreeList data={ListDataSource} />
-        <DataTable dataSource={dataSource} loadMoreData={loadMoreData} />
+        <GroupsList data={ListDataSource} />
+        <Tabs
+          defaultActiveKey="1"
+          items={[
+            {
+              key: '1',
+              label: 'Paths',
+              children: <DataTable dataSource={dataSource} />
+            },
+            {
+              key: '2',
+              label: 'Options',
+              children: ''
+            }
+          ]}
+        />
       </div>
     </div>
   )

@@ -11,20 +11,15 @@ const DataTable = ({ dataSource, loadMoreData }) => {
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name'
-    },
-    {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age'
-    },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address'
+      title: 'Path',
+      dataIndex: 'path',
+      key: 'path'
     }
+    // {
+    //   title: 'Exclude',
+    //   dataIndex: 'exclude',
+    //   key: 'exclude'
+    // }
   ]
 
   return (
@@ -33,7 +28,8 @@ const DataTable = ({ dataSource, loadMoreData }) => {
         dataSource={dataSource}
         columns={columns}
         pagination={false}
-        scroll={{ y: 'calc(100vh - 200px)' }} // Adjust height as needed
+        size="small"
+        scroll={{ y: 'calc(100vh - 100px)' }} // Adjust height as needed
       />
     </div>
   )
@@ -43,12 +39,10 @@ DataTable.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      age: PropTypes.number.isRequired,
-      address: PropTypes.string.isRequired
+      path: PropTypes.string.isRequired
     })
   ).isRequired,
-  loadMoreData: PropTypes.func.isRequired
+  loadMoreData: PropTypes.func
 }
 
 export default DataTable
