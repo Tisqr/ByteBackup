@@ -5,6 +5,11 @@ import DataTable from './components/DataTable'
 import GroupsList from './components/GroupsList'
 import { Tabs } from 'antd'
 import './assets/App.css'
+import Store from 'electron-store'
+
+const store = new Store()
+
+store.set('hello', 'hi')
 
 const ListDataSource = ['Homework Backup']
 
@@ -12,59 +17,7 @@ const TableDataSource = [
   {
     key: '1',
     path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
-  {
-    key: '1',
-    path: 'test'
-  },
+  }
 ]
 
 function App() {

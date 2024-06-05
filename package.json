@@ -18,7 +18,8 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
-    "antd": "^5.17.4"
+    "antd": "^5.17.4",
+    "electron-store": "^9.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
