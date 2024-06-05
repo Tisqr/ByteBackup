@@ -3,41 +3,86 @@ import { useState } from 'react'
 import Header from './components/Header'
 import DataTable from './components/DataTable'
 import GroupsList from './components/GroupsList'
-import copyFile from './components/copyFile'
 import { Tabs } from 'antd'
 import './assets/App.css'
 
-const ListDataSource = [
-  'Racing car sprays burning fuel into crowd.',
-  'Japanese princess to wed commoner.',
-  'Australian walks 100km after outback crash.',
-  'Man charged over missing wedding girl.',
-  'Los Angeles battles huge wildfires.'
-]
+const ListDataSource = ['Homework Backup']
 
 const TableDataSource = [
   {
     key: '1',
     path: 'test'
-  }
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
+  {
+    key: '1',
+    path: 'test'
+  },
 ]
 
 function App() {
   const [dataSource, setDataSource] = useState(TableDataSource)
   var BackupLoc = 'test'
 
-  const handleCopy = async () => {
-    for (const path of dataSource) {
-      var temp = path.path.split('/').slice(-1).pop()
-      await copyFile(path.path, BackupLoc + temp)
+  const handleCopyFiles = async () => {
+    try {
+      const result = await window.electron.copyFiles(dataSource, BackupLoc)
+      console.log(result)
+    } catch (error) {
+      console.error('Error copying files:', error)
     }
   }
 
-  handleCopy()
-
   return (
     <div className="app-container">
-      <Header BackupLoc={BackupLoc} />
+      <Header BackupLoc={BackupLoc} BackupFunc={handleCopyFiles} />
       <div className="content">
         <GroupsList data={ListDataSource} />
         <Tabs

@@ -29,7 +29,7 @@ const DataTable = ({ dataSource, loadMoreData }) => {
         columns={columns}
         pagination={false}
         size="small"
-        scroll={{ y: 'calc(100vh - 100px)' }} // Adjust height as needed
+        scroll={{ y: 'calc(100vh - 200px)' }} // Adjust height as needed
       />
     </div>
   )

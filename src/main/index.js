@@ -3,16 +3,19 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 const fs = require('node:fs')
+import path from 'node:path'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 670,
+    minWidth: 800,
+    minHeight: 670,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js')
+      preload: join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      enableRemoteModule: false
     }
   })
 
@@ -34,6 +37,39 @@ function createWindow() {
   }
 }
 
+const handleCopy = async (dataSource, backupLoc) => {
+  const copyItem = async (src, dest) => {
+    try {
+      const stats = fs.lstatSync(src)
+
+      if (stats.isDirectory()) {
+        if (!fs.existsSync(dest)) {
+          fs.mkdirSync(dest, { recursive: true })
+        }
+        const items = fs.readdirSync(src)
+        for (const item of items) {
+          await copyItem(join(src, item), join(dest, item))
+        }
+      } else {
+        fs.copyFileSync(src, dest)
+      }
+    } catch (error) {
+      console.error(`Failed to copy ${src} to ${dest}:`, error)
+    }
+  }
+
+  for (const item of dataSource) {
+    const fileName = path.basename(item.path)
+    const destination = path.join(backupLoc, fileName)
+
+    try {
+      await copyItem(item.path, destination)
+    } catch (error) {
+      console.error(`Failed to handle item ${item.path}:`, error)
+    }
+  }
+}
+
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
 
@@ -41,13 +77,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle('copy-file', async (event, source, destination) => {
-    try {
-      await fs.promises.cp(source, destination)
-      return { success: true }
-    } catch (error) {
-      return { success: false, message: error.message }
-    }
+  ipcMain.handle('copy-files', async (event, dataSource, backupLoc) => {
+    await handleCopy(dataSource, backupLoc)
+    return 'Copy Completed'
   })
 
   createWindow()
