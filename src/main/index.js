@@ -37,6 +37,17 @@ function createWindow() {
   }
 }
 
+const handleUpdateFile = async (data) => {
+  const appPath = app.getAppPath()
+  const filePath = path.join(appPath, 'db.json')
+  try {
+    fs.writeFileSync(filePath, data)
+    console.log(filePath)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 const handleCopy = async (dataSource, backupLoc) => {
   const copyItem = async (src, dest) => {
     try {
@@ -79,7 +90,10 @@ app.whenReady().then(() => {
 
   ipcMain.handle('copy-files', async (event, dataSource, backupLoc) => {
     await handleCopy(dataSource, backupLoc)
-    return 'Copy Completed'
+  })
+
+  ipcMain.handle('update-file', async (event, data) => {
+    await handleUpdateFile(data)
   })
 
   createWindow()

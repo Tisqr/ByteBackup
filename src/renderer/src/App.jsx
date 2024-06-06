@@ -5,24 +5,27 @@ import DataTable from './components/DataTable'
 import GroupsList from './components/GroupsList'
 import { Tabs } from 'antd'
 import './assets/App.css'
-import Store from 'electron-store'
 
-const store = new Store()
-
-store.set('hello', 'hi')
-
-const ListDataSource = ['Homework Backup']
-
-const TableDataSource = [
+let configData = [
   {
-    key: '1',
-    path: 'test'
+    BackupLoc: 'test',
+    TableDataSource: [
+      {
+        key: '1',
+        path: 'test'
+      }
+    ],
+    ListDataSource: ['Homework Backup']
   }
 ]
 
+const ListDataSource = configData[0].ListDataSource
+
+const TableDataSource = configData[0].TableDataSource
+
 function App() {
   const [dataSource, setDataSource] = useState(TableDataSource)
-  var BackupLoc = 'test'
+  var BackupLoc = configData[0].BackupLoc
 
   const handleCopyFiles = async () => {
     try {

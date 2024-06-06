@@ -1,9 +1,6 @@
 import { Input, Button, Tooltip } from 'antd'
 import { PlusOutlined, CheckOutlined, DeleteOutlined, ToolOutlined } from '@ant-design/icons'
 import PropTypes from 'prop-types'
-// import Store from 'electron-store'
-
-// const store = new Store()
 
 const { Search } = Input
 
