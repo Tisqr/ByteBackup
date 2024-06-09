@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-const fs = require('node:fs')
+const fs = require('node:fs').promises
 import path from 'node:path'
 
 function createWindow() {
@@ -41,28 +41,38 @@ const handleUpdateFile = async (data) => {
   const appPath = app.getAppPath()
   const filePath = path.join(appPath, 'db.json')
   try {
-    fs.writeFileSync(filePath, data)
+    fs.writeFile(filePath, data)
     console.log(filePath)
   } catch (err) {
     console.error(err)
   }
 }
 
+const handleGetFile = async () => {
+  try {
+    const data = await fs.readFile(path.join(app.getAppPath(), 'db.json'), 'utf8')
+    return data
+  } catch (error) {
+    console.error('Error reading file:', error)
+    throw error
+  }
+}
+
 const handleCopy = async (dataSource, backupLoc) => {
   const copyItem = async (src, dest) => {
     try {
-      const stats = fs.lstatSync(src)
+      const stats = await fs.lstat(src)
 
       if (stats.isDirectory()) {
-        if (!fs.existsSync(dest)) {
-          fs.mkdirSync(dest, { recursive: true })
+        if (!(await fs.exists(dest))) {
+          await fs.mkdir(dest, { recursive: true })
         }
-        const items = fs.readdirSync(src)
+        const items = await fs.readdir(src)
         for (const item of items) {
           await copyItem(join(src, item), join(dest, item))
         }
       } else {
-        fs.copyFileSync(src, dest)
+        await fs.copyFile(src, dest)
       }
     } catch (error) {
       console.error(`Failed to copy ${src} to ${dest}:`, error)
@@ -71,7 +81,7 @@ const handleCopy = async (dataSource, backupLoc) => {
 
   for (const item of dataSource) {
     const fileName = path.basename(item.path)
-    const destination = path.join(backupLoc, fileName)
+    const destination = join(backupLoc, fileName)
 
     try {
       await copyItem(item.path, destination)
@@ -96,6 +106,9 @@ app.whenReady().then(() => {
     await handleUpdateFile(data)
   })
 
+  ipcMain.handle('get-file', async () => {
+    return handleGetFile()
+  })
   createWindow()
 
   app.on('activate', function () {
