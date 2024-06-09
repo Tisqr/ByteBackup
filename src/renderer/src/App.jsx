@@ -11,24 +11,57 @@ function App() {
   const [dataSource, setDataSource] = useState([])
   const [backupLoc, setBackupLoc] = useState('')
   const [listDataSource, setListDataSource] = useState([])
-  const [dataLoaded, setDataLoaded] = useState(false) // New state to track if data is loaded
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [ModalValue, setModalValue] = useState('hello')
+  const [SelectValue, setSelectValue] = useState('path')
+  const [activeItem, setActiveItem] = useState([])
+
+  const deleteItem = () => {
+    if (activeItem[0] === 'list') {
+      const updatedList = listDataSource.filter((item) => item !== activeItem[1])
+      setListDataSource(updatedList)
+    } else {
+      const updatedDataSource = dataSource.filter((item) => item.path !== activeItem[1])
+      setDataSource(updatedDataSource)
+    }
+  }
 
   const showModal = () => {
     setIsModalOpen(true)
   }
 
+  const addDataToTable = () => {
+    if (ModalValue != '') {
+      if (SelectValue === 'path') {
+        setDataSource((prevDataSource) => {
+          const newDataSource = [...prevDataSource]
+          newDataSource.sort((a, b) => a.key - b.key)
+          const lastKey = newDataSource.length ? newDataSource[newDataSource.length - 1].key : 0
+          const myObject = { key: String(Number(lastKey) + 1), path: ModalValue }
+          return [...newDataSource, myObject]
+        })
+      } else {
+        setListDataSource((prevListDataSource) => [...prevListDataSource, ModalValue])
+      }
+    }
+    setIsModalOpen(false)
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
-        let result = JSON.parse(await window.electron.getFile())
-        setBackupLoc(result.BackupLoc)
-        setDataSource(result.TableDataSource)
-        setListDataSource(result.ListDataSource)
-        setDataLoaded(true)
+        let result = await window.electron.getFile()
+        result = JSON.parse(result)
+        if (result && typeof result === 'object') {
+          setBackupLoc(result.BackupLoc)
+          setDataSource(result.TableDataSource)
+          setListDataSource(result.ListDataSource)
+        }
       } catch (error) {
         console.error('Error getting file:', error)
       }
     }
+    setDataLoaded(true)
 
     fetchData()
   }, [])
@@ -47,6 +80,10 @@ function App() {
     }
   }, [backupLoc, dataSource, listDataSource, dataLoaded])
 
+  useEffect(() => {
+    console.log(activeItem)
+  }, [activeItem])
+
   return (
     <div className="app-container">
       <Header
@@ -54,14 +91,31 @@ function App() {
         setBackupLoc={setBackupLoc}
         BackupFunc={() => window.electron.copyFiles(dataSource, backupLoc)}
         showModal={showModal}
+        DeleteItem={deleteItem}
       />
       <div className="content">
-        <GroupsList data={listDataSource} />
-        <NewModal setIsModalOpen={setIsModalOpen} isModalOpen={isModalOpen} />
+        <GroupsList
+          data={listDataSource}
+          setActiveListItem={setActiveItem}
+          ActiveListItem={activeItem}
+        />
+        <NewModal
+          ModalValue={ModalValue}
+          setModalValue={setModalValue}
+          setIsModalOpen={setIsModalOpen}
+          isModalOpen={isModalOpen}
+          handleOk={addDataToTable}
+          SelectValue={SelectValue}
+          setSelectValue={setSelectValue}
+        />
         <Tabs
           defaultActiveKey="1"
           items={[
-            { key: '1', label: 'Paths', children: <DataTable dataSource={dataSource} /> },
+            {
+              key: '1',
+              label: 'Paths',
+              children: <DataTable dataSource={dataSource} setActiveTableItem={setActiveItem} />
+            },
             { key: '2', label: 'Options', children: '' }
           ]}
         />

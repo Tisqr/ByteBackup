@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 const { Search } = Input
 
-const Header = ({ BackupLoc, setBackupLoc, BackupFunc, showModal }) => {
+const Header = ({ BackupLoc, setBackupLoc, BackupFunc, showModal, DeleteItem }) => {
   const handleInputChange = (e) => {
     setBackupLoc(e.target.value)
   }
@@ -19,7 +19,7 @@ const Header = ({ BackupLoc, setBackupLoc, BackupFunc, showModal }) => {
         <Tooltip title="Delete">
           <Button
             type="primary"
-            onClick={() => console.log(BackupLoc)} // works
+            onClick={DeleteItem} // works
             shape="default"
             icon={<DeleteOutlined />}
           />
@@ -46,7 +46,8 @@ Header.propTypes = {
   BackupFunc: PropTypes.func,
   BackupLoc: PropTypes.string,
   setBackupLoc: PropTypes.func, // Add the setter function prop type
-  showModal: PropTypes.func
+  showModal: PropTypes.func,
+  DeleteItem: PropTypes.func
 }
 
 export default Header

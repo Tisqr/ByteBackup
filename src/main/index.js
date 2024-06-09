@@ -35,6 +35,8 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  mainWindow.webContents.openDevTools()
 }
 
 const handleUpdateFile = async (data) => {
@@ -42,7 +44,6 @@ const handleUpdateFile = async (data) => {
   const filePath = path.join(appPath, 'db.json')
   try {
     fs.writeFile(filePath, data)
-    console.log(filePath)
   } catch (err) {
     console.error(err)
   }
