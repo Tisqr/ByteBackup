@@ -1,7 +1,7 @@
 import { Table } from 'antd'
 import PropTypes from 'prop-types'
 
-const DataTable = ({ dataSource, loadMoreData, setActiveTableItem }) => {
+const DataTable = ({ dataSource, loadMoreData, setActiveTableItem, ActiveItem }) => {
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target
     if (scrollTop + clientHeight >= scrollHeight - 5) {
@@ -9,34 +9,37 @@ const DataTable = ({ dataSource, loadMoreData, setActiveTableItem }) => {
     }
   }
 
-  const handleRowClick = (record) => {
-    setActiveTableItem(['table', record.path])
-  }
-
   const columns = [
     {
       title: 'Path',
       dataIndex: 'path',
       key: 'path',
-      render: (text, record) => (
-        <a href="#" onClick={() => handleRowClick(record)}>
-          {text}
-        </a>
-      )
+      render: (text) => <p>{text}</p>
     }
   ]
+
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setActiveTableItem({ ...ActiveItem, Table: selectedRows })
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === 'Disabled User',
+      key: record.key // Use key instead of path
+    })
+  }
 
   return (
     <div className="table-container" onScroll={handleScroll}>
       <Table
-        dataSource={[...dataSource]}
+        rowSelection={{
+          type: 'checkbox',
+          ...rowSelection
+        }}
+        dataSource={dataSource}
         columns={columns}
         pagination={false}
         size="small"
         scroll={{ y: 'calc(100vh - 200px)' }} // Adjust height as needed
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record)
-        })}
       />
     </div>
   )
@@ -45,12 +48,13 @@ const DataTable = ({ dataSource, loadMoreData, setActiveTableItem }) => {
 DataTable.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
-      key: PropTypes.string.isRequired,
+      key: PropTypes.string.isRequired, // Ensure key is present in the dataSource
       path: PropTypes.string.isRequired
     })
   ).isRequired,
   loadMoreData: PropTypes.func,
-  setActiveTableItem: PropTypes.func.isRequired
+  setActiveTableItem: PropTypes.func.isRequired,
+  ActiveItem: PropTypes.object
 }
 
 export default DataTable

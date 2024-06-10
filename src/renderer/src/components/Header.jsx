@@ -13,9 +13,6 @@ const Header = ({ BackupLoc, setBackupLoc, BackupFunc, showModal, DeleteItem }) 
     <>
       <div className="header">
         <Search placeholder="Search..." enterButton />
-        <Tooltip title="Options">
-          <Button type="primary" shape="default" icon={<ToolOutlined />} />
-        </Tooltip>
         <Tooltip title="Delete">
           <Button
             type="primary"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from './components/Header'
 import DataTable from './components/DataTable'
 import GroupsList from './components/GroupsList'
@@ -12,18 +12,27 @@ function App() {
   const [backupLoc, setBackupLoc] = useState('')
   const [listDataSource, setListDataSource] = useState([])
   const [dataLoaded, setDataLoaded] = useState(false)
-  const [ModalValue, setModalValue] = useState('hello')
+  const [ModalValue, setModalValue] = useState('')
   const [SelectValue, setSelectValue] = useState('path')
-  const [activeItem, setActiveItem] = useState([])
+  const [activeItem, setActiveItem] = useState({
+    List: [],
+    Table: []
+  })
+
+  const setActiveListItem = (newActiveItem) => {
+    setActiveItem(newActiveItem)
+  }
 
   const deleteItem = () => {
-    if (activeItem[0] === 'list') {
-      const updatedList = listDataSource.filter((item) => item !== activeItem[1])
-      setListDataSource(updatedList)
-    } else {
-      const updatedDataSource = dataSource.filter((item) => item.path !== activeItem[1])
-      setDataSource(updatedDataSource)
-    }
+    const updatedList = listDataSource.filter((item) => !activeItem.List.includes(item))
+    setListDataSource(updatedList)
+
+    const updatedDataSource = dataSource.filter((item) => {
+      return !activeItem.Table.some((active) => active.key === item.key)
+    })
+    setDataSource(updatedDataSource)
+
+    setActiveItem({ List: [], Table: [] })
   }
 
   const showModal = () => {
@@ -31,7 +40,7 @@ function App() {
   }
 
   const addDataToTable = () => {
-    if (ModalValue != '') {
+    if (ModalValue !== '') {
       if (SelectValue === 'path') {
         setDataSource((prevDataSource) => {
           const newDataSource = [...prevDataSource]
@@ -62,7 +71,6 @@ function App() {
       }
     }
     setDataLoaded(true)
-
     fetchData()
   }, [])
 
@@ -81,7 +89,8 @@ function App() {
   }, [backupLoc, dataSource, listDataSource, dataLoaded])
 
   useEffect(() => {
-    console.log(activeItem)
+    console.log('Active List Item: ', activeItem.List[0])
+    console.log('Active Item: ', activeItem)
   }, [activeItem])
 
   return (
@@ -96,7 +105,7 @@ function App() {
       <div className="content">
         <GroupsList
           data={listDataSource}
-          setActiveListItem={setActiveItem}
+          setActiveListItem={setActiveListItem}
           ActiveListItem={activeItem}
         />
         <NewModal
@@ -114,7 +123,13 @@ function App() {
             {
               key: '1',
               label: 'Paths',
-              children: <DataTable dataSource={dataSource} setActiveTableItem={setActiveItem} />
+              children: (
+                <DataTable
+                  dataSource={dataSource}
+                  setActiveTableItem={setActiveItem} // Updated to set multiple selected items
+                  ActiveItem={activeItem}
+                />
+              )
             },
             { key: '2', label: 'Options', children: '' }
           ]}

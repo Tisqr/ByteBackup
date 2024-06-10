@@ -1,10 +1,14 @@
-import { List } from 'antd'
+import { List, Checkbox } from 'antd'
 import PropTypes from 'prop-types'
 
-const GroupsList = ({ data, setActiveListItem }) => {
-  const handleActiveItemChange = (item) => {
-    setActiveListItem(['list', item])
+const GroupsList = ({ data, setActiveListItem, ActiveListItem }) => {
+  const handleCheckboxChange = (item, checked) => {
+    const updatedList = checked
+      ? [...ActiveListItem.List, item]
+      : ActiveListItem.List.filter((value) => value !== item)
+    setActiveListItem({ ...ActiveListItem, List: updatedList })
   }
+
   return (
     <div className="list-container">
       <List
@@ -13,13 +17,12 @@ const GroupsList = ({ data, setActiveListItem }) => {
         dataSource={data}
         renderItem={(item) => (
           <List.Item>
-            <List.Item.Meta
-              title={
-                <a href="#" onClick={() => handleActiveItemChange(item)}>
-                  {item}
-                </a>
-              }
-            />
+            <Checkbox
+              checked={ActiveListItem && ActiveListItem.List.includes(item)}
+              onChange={(e) => handleCheckboxChange(item, e.target.checked)}
+            >
+              {item}
+            </Checkbox>
           </List.Item>
         )}
       />
@@ -29,7 +32,7 @@ const GroupsList = ({ data, setActiveListItem }) => {
 
 GroupsList.propTypes = {
   data: PropTypes.arrayOf(PropTypes.string).isRequired,
-  ActiveListItem: PropTypes.array,
+  ActiveListItem: PropTypes.object,
   setActiveListItem: PropTypes.func.isRequired
 }
 
