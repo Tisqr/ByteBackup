@@ -1,28 +1,31 @@
-import { List, Checkbox } from 'antd'
+import { List } from 'antd'
 import PropTypes from 'prop-types'
+import { DeleteOutlined } from '@ant-design/icons'
 
-const GroupsList = ({ data, setActiveListItem, ActiveListItem }) => {
-  const handleCheckboxChange = (item, checked) => {
-    const updatedList = checked
-      ? [...ActiveListItem.List, item]
-      : ActiveListItem.List.filter((value) => value !== item)
-    setActiveListItem({ ...ActiveListItem, List: updatedList })
+const GroupsList = ({ data, ListDataSource, setListDataSource }) => {
+  const handleDelete = (e) => {
+    console.log('deleting')
+    let initialData = ListDataSource
+    initialData = initialData.filter(
+      (item) => item !== e.target.parentNode.parentNode.parentNode.parentNode.firstChild.textContent
+    )
+    setListDataSource(initialData)
   }
 
   return (
     <div className="list-container">
       <List
         size="small"
-        header={<div>File Paths</div>}
+        header={<div>Groups</div>}
         dataSource={data}
         renderItem={(item) => (
           <List.Item>
-            <Checkbox
-              checked={ActiveListItem && ActiveListItem.List.includes(item)}
-              onChange={(e) => handleCheckboxChange(item, e.target.checked)}
-            >
-              {item}
-            </Checkbox>
+            <div>{item}</div>
+            <div>
+              <a onClick={handleDelete}>
+                <DeleteOutlined />
+              </a>
+            </div>
           </List.Item>
         )}
       />
@@ -32,8 +35,8 @@ const GroupsList = ({ data, setActiveListItem, ActiveListItem }) => {
 
 GroupsList.propTypes = {
   data: PropTypes.arrayOf(PropTypes.string).isRequired,
-  ActiveListItem: PropTypes.object,
-  setActiveListItem: PropTypes.func.isRequired
+  ListDataSource: PropTypes.array,
+  setListDataSource: PropTypes.func.isRequired
 }
 
 export default GroupsList

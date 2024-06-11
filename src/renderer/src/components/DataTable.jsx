@@ -1,45 +1,29 @@
-import { Table } from 'antd'
+import { List } from 'antd'
+import { DeleteOutlined } from '@ant-design/icons'
+
 import PropTypes from 'prop-types'
 
-const DataTable = ({ dataSource, loadMoreData, setActiveTableItem, ActiveItem }) => {
-  const handleScroll = (e) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target
-    if (scrollTop + clientHeight >= scrollHeight - 5) {
-      loadMoreData()
-    }
-  }
-
-  const columns = [
-    {
-      title: 'Path',
-      dataIndex: 'path',
-      key: 'path',
-      render: (text) => <p>{text}</p>
-    }
-  ]
-
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      setActiveTableItem({ ...ActiveItem, Table: selectedRows })
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === 'Disabled User',
-      key: record.key // Use key instead of path
-    })
+const DataTable = ({ dataSource, setDataSource }) => {
+  const handleDelete = (item) => {
+    const updatedData = dataSource.filter((dataItem) => dataItem.key !== item.key)
+    setDataSource(updatedData)
   }
 
   return (
-    <div className="table-container" onScroll={handleScroll}>
-      <Table
-        rowSelection={{
-          type: 'checkbox',
-          ...rowSelection
-        }}
-        dataSource={dataSource}
-        columns={columns}
-        pagination={false}
+    <div className="list-container">
+      <List
         size="small"
-        scroll={{ y: 'calc(100vh - 200px)' }} // Adjust height as needed
+        dataSource={dataSource}
+        renderItem={(item) => (
+          <List.Item>
+            <div>{item.path}</div>
+            <div>
+              <a href="#" onClick={() => handleDelete(item)}>
+                <DeleteOutlined />
+              </a>
+            </div>
+          </List.Item>
+        )}
       />
     </div>
   )
@@ -48,13 +32,11 @@ const DataTable = ({ dataSource, loadMoreData, setActiveTableItem, ActiveItem })
 DataTable.propTypes = {
   dataSource: PropTypes.arrayOf(
     PropTypes.shape({
-      key: PropTypes.string.isRequired, // Ensure key is present in the dataSource
+      key: PropTypes.string.isRequired,
       path: PropTypes.string.isRequired
     })
   ).isRequired,
-  loadMoreData: PropTypes.func,
-  setActiveTableItem: PropTypes.func.isRequired,
-  ActiveItem: PropTypes.object
+  setDataSource: PropTypes.func.isRequired
 }
 
 export default DataTable

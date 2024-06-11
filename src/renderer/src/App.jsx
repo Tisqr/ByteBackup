@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import DataTable from './components/DataTable'
 import GroupsList from './components/GroupsList'
 import NewModal from './components/Modal'
+import OptionTab from './components/OptionsTab'
 import { Tabs } from 'antd'
 import './assets/App.css'
 
@@ -14,26 +15,6 @@ function App() {
   const [dataLoaded, setDataLoaded] = useState(false)
   const [ModalValue, setModalValue] = useState('')
   const [SelectValue, setSelectValue] = useState('path')
-  const [activeItem, setActiveItem] = useState({
-    List: [],
-    Table: []
-  })
-
-  const setActiveListItem = (newActiveItem) => {
-    setActiveItem(newActiveItem)
-  }
-
-  const deleteItem = () => {
-    const updatedList = listDataSource.filter((item) => !activeItem.List.includes(item))
-    setListDataSource(updatedList)
-
-    const updatedDataSource = dataSource.filter((item) => {
-      return !activeItem.Table.some((active) => active.key === item.key)
-    })
-    setDataSource(updatedDataSource)
-
-    setActiveItem({ List: [], Table: [] })
-  }
 
   const showModal = () => {
     setIsModalOpen(true)
@@ -88,52 +69,48 @@ function App() {
     }
   }, [backupLoc, dataSource, listDataSource, dataLoaded])
 
-  useEffect(() => {
-    console.log('Active List Item: ', activeItem.List[0])
-    console.log('Active Item: ', activeItem)
-  }, [activeItem])
-
   return (
     <div className="app-container">
-      <Header
-        BackupLoc={backupLoc}
-        setBackupLoc={setBackupLoc}
-        BackupFunc={() => window.electron.copyFiles(dataSource, backupLoc)}
-        showModal={showModal}
-        DeleteItem={deleteItem}
-      />
+      <Header BackupLoc={backupLoc} showModal={showModal} />
       <div className="content">
-        <GroupsList
-          data={listDataSource}
-          setActiveListItem={setActiveListItem}
-          ActiveListItem={activeItem}
-        />
-        <NewModal
-          ModalValue={ModalValue}
-          setModalValue={setModalValue}
-          setIsModalOpen={setIsModalOpen}
-          isModalOpen={isModalOpen}
-          handleOk={addDataToTable}
-          SelectValue={SelectValue}
-          setSelectValue={setSelectValue}
-        />
-        <Tabs
-          defaultActiveKey="1"
-          items={[
-            {
-              key: '1',
-              label: 'Paths',
-              children: (
-                <DataTable
-                  dataSource={dataSource}
-                  setActiveTableItem={setActiveItem} // Updated to set multiple selected items
-                  ActiveItem={activeItem}
-                />
-              )
-            },
-            { key: '2', label: 'Options', children: '' }
-          ]}
-        />
+        <div className="groups-list-container">
+          <GroupsList
+            data={listDataSource}
+            ListDataSource={listDataSource}
+            setListDataSource={setListDataSource}
+          />
+        </div>
+        <div className="tabs-container">
+          <NewModal
+            ModalValue={ModalValue}
+            setModalValue={setModalValue}
+            setIsModalOpen={setIsModalOpen}
+            isModalOpen={isModalOpen}
+            handleOk={addDataToTable}
+            SelectValue={SelectValue}
+            setSelectValue={setSelectValue}
+          />
+          <Tabs
+            defaultActiveKey="1"
+            items={[
+              {
+                key: '1',
+                label: 'Paths',
+                children: <DataTable dataSource={dataSource} setDataSource={setDataSource} />
+              },
+              {
+                key: '2',
+                label: 'Options',
+                children: (
+                  <OptionTab
+                    setBackupLoc={setBackupLoc}
+                    BackupFunc={() => window.electron.copyFiles(dataSource, backupLoc)}
+                  />
+                )
+              }
+            ]}
+          />
+        </div>
       </div>
     </div>
   )

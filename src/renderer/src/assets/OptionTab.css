@@ -1,0 +1,15 @@
+.option-tab-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.backup-input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.backup-button {
+  align-self: flex-end;
+}

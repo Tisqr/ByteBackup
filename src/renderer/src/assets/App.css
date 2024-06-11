@@ -22,14 +22,33 @@ body {
   display: flex;
   flex: 1;
   gap: 16px;
+  overflow: hidden;
+}
+
+.groups-list-container {
+  flex: 0 0 30%; /* Adjust width as needed */
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.tabs-container {
+  flex: 1; /* Take the remaining space */
+  display: flex;
+  flex-direction: column;
 }
 
 .list-container {
-  flex: 0 0 30%;
-  overflow: auto;
+  flex: 1; /* Ensure list-container takes up available space */
+  display: flex;
+  flex-direction: column;
 }
 
-.table-container {
+.list-container .ant-list {
+  flex: 1; /* Ensure the Ant Design List takes up the full height */
+}
+
+.list-container .ant-list-items {
   flex: 1;
-  overflow: auto;
+  overflow: auto; /* Ensure the list items scroll correctly */
 }
