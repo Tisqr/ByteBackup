@@ -2,14 +2,18 @@ import { List } from 'antd'
 import PropTypes from 'prop-types'
 import { DeleteOutlined } from '@ant-design/icons'
 
-const GroupsList = ({ data, ListDataSource, setListDataSource }) => {
+const GroupsList = ({ Data, setActiveItem, ListDataSource, setData }) => {
   const handleDelete = (e) => {
-    console.log('deleting')
-    let initialData = ListDataSource
+    let initialData = [...Data]
     initialData = initialData.filter(
-      (item) => item !== e.target.parentNode.parentNode.parentNode.parentNode.firstChild.textContent
+      (item) =>
+        item.name !== e.target.parentNode.parentNode.parentNode.parentNode.firstChild.textContent
     )
-    setListDataSource(initialData)
+    setData(initialData)
+  }
+
+  const handleActiveItemChange = (e) => {
+    setActiveItem(e.target.textContent)
   }
 
   return (
@@ -17,10 +21,14 @@ const GroupsList = ({ data, ListDataSource, setListDataSource }) => {
       <List
         size="small"
         header={<div>Groups</div>}
-        dataSource={data}
+        dataSource={ListDataSource}
         renderItem={(item) => (
           <List.Item>
-            <div>{item}</div>
+            <div>
+              <a href="#" onClick={handleActiveItemChange}>
+                {item}
+              </a>
+            </div>
             <div>
               <a onClick={handleDelete}>
                 <DeleteOutlined />
@@ -34,9 +42,10 @@ const GroupsList = ({ data, ListDataSource, setListDataSource }) => {
 }
 
 GroupsList.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.string).isRequired,
-  ListDataSource: PropTypes.array,
-  setListDataSource: PropTypes.func.isRequired
+  Data: PropTypes.array.isRequired,
+  setData: PropTypes.func.isRequired,
+  ListDataSource: PropTypes.array.isRequired,
+  setActiveItem: PropTypes.func.isRequired
 }
 
 export default GroupsList

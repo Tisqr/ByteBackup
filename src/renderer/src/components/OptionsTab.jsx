@@ -1,20 +1,33 @@
 import { Input, Button, Tooltip } from 'antd'
 import { CheckOutlined } from '@ant-design/icons'
 import PropTypes from 'prop-types'
-import '../assets/OptionTab.css' // Import the CSS file for styling
+import '../assets/OptionTab.css'
 
-const OptionTab = ({ BackupFunc, BackupLoc, setBackupLoc }) => {
+const OptionTab = ({ Data, setData, ActiveItem, BackupFunc }) => {
   const handleInputChange = (e) => {
-    setBackupLoc(e.target.value)
+    const newData = Data.map((item) => {
+      if (item.name === ActiveItem) {
+        return {
+          ...item,
+          config: {
+            ...item.config,
+            BackupLoc: e.target.value
+          }
+        }
+      }
+      return item
+    })
+
+    setData(newData)
   }
 
   return (
     <div className="option-tab-container">
       <Input
         placeholder="Enter Backup Location (e.g., /path/to/backup)"
-        value={BackupLoc} // Use value instead of defaultValue
-        onChange={handleInputChange} // Add onChange handler
-        className="backup-input" // Add a class for styling
+        value={Data.find((item) => item.name === ActiveItem)?.config.BackupLoc || ''}
+        onChange={handleInputChange}
+        className="backup-input"
       />
       <Tooltip title="Backup">
         <Button
@@ -30,9 +43,10 @@ const OptionTab = ({ BackupFunc, BackupLoc, setBackupLoc }) => {
 }
 
 OptionTab.propTypes = {
-  BackupLoc: PropTypes.string,
-  setBackupLoc: PropTypes.func, // Add the setter function prop type
-  BackupFunc: PropTypes.func
+  Data: PropTypes.array.isRequired,
+  setData: PropTypes.func.isRequired,
+  ActiveItem: PropTypes.string.isRequired,
+  BackupFunc: PropTypes.func.isRequired
 }
 
 export default OptionTab

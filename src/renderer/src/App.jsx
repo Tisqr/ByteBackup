@@ -7,26 +7,41 @@ import { Tabs } from 'antd'
 import './assets/App.css'
 
 function App() {
+  const [Data, setData] = useState([])
   const [dataSource, setDataSource] = useState([])
   const [backupLoc, setBackupLoc] = useState('')
   const [listDataSource, setListDataSource] = useState([])
   const [dataLoaded, setDataLoaded] = useState(false)
   const [InputValue, setInputValue] = useState('')
   const [SelectValue, setSelectValue] = useState('path')
+  const [ActiveItem, setActiveItem] = useState('test')
 
   const addDataToTable = () => {
     if (InputValue !== '') {
-      if (SelectValue === 'path') {
-        setDataSource((prevDataSource) => {
-          const newDataSource = [...prevDataSource]
-          newDataSource.sort((a, b) => a.key - b.key)
-          const lastKey = newDataSource.length ? newDataSource[newDataSource.length - 1].key : 0
-          const myObject = { key: String(Number(lastKey) + 1), path: InputValue }
-          return [...newDataSource, myObject]
-        })
-      } else {
-        setListDataSource((prevListDataSource) => [...prevListDataSource, InputValue])
-      }
+      setData((prevData) => {
+        const newData = [...prevData]
+        const activeItemIndex = newData.findIndex((item) => item.name === ActiveItem)
+
+        if (activeItemIndex !== -1) {
+          if (SelectValue === 'path') {
+            const newDataSource = [...newData[activeItemIndex].TableData]
+            newDataSource.sort((a, b) => a.key - b.key)
+            const lastKey = newDataSource.length ? newDataSource[newDataSource.length - 1].key : 0
+            const myObject = { key: String(Number(lastKey) + 1), path: InputValue }
+            newData[activeItemIndex].TableData = [...newDataSource, myObject]
+          }
+        } else if (SelectValue === 'group') {
+          let tempItem = {
+            name: InputValue,
+            TableData: [],
+            config: {
+              BackupLoc: ''
+            }
+          }
+          newData.push(tempItem)
+        }
+        return newData
+      })
     }
   }
 
@@ -35,10 +50,8 @@ function App() {
       try {
         let result = await window.electron.getFile()
         result = JSON.parse(result)
-        if (result && typeof result === 'object') {
-          setBackupLoc(result.BackupLoc)
-          setDataSource(result.TableDataSource)
-          setListDataSource(result.ListDataSource)
+        if (result) {
+          setData(result)
         }
       } catch (error) {
         console.error('Error getting file:', error)
@@ -49,18 +62,51 @@ function App() {
   }, [])
 
   useEffect(() => {
-    async function setData() {
-      let tempData = {}
-      tempData['BackupLoc'] = backupLoc
-      tempData['TableDataSource'] = dataSource
-      tempData['ListDataSource'] = listDataSource
+    let tempData = []
 
-      window.electron.updateFile(JSON.stringify(tempData))
+    async function fsetDataSource() {
+      for (const item of Data) {
+        if (item.name === ActiveItem) {
+          tempData = item.TableData
+        }
+      }
+      setDataSource(tempData)
+    }
+
+    fsetDataSource()
+
+    tempData = []
+
+    async function fsetListDataSource() {
+      for (const item of Data) {
+        tempData.push(item.name)
+      }
+      setListDataSource(tempData)
+    }
+
+    fsetListDataSource()
+
+    let tempbackuploc
+
+    async function fsetBackupLoc() {
+      for (const item of Data) {
+        if (item.name === ActiveItem) tempbackuploc = item.config.BackupLoc
+      }
+      setBackupLoc(tempbackuploc)
+    }
+
+    fsetBackupLoc()
+  }, [Data, ActiveItem])
+
+  useEffect(() => {
+    async function setData() {
+      window.electron.updateFile(JSON.stringify(Data))
     }
     if (dataLoaded) {
       setData()
+      console.log('ST')
     }
-  }, [backupLoc, dataSource, listDataSource, dataLoaded])
+  }, [Data, dataLoaded])
 
   return (
     <div className="app-container">
@@ -75,9 +121,10 @@ function App() {
       <div className="content">
         <div className="groups-list-container">
           <GroupsList
-            data={listDataSource}
+            Data={Data}
+            setData={setData}
+            setActiveItem={setActiveItem}
             ListDataSource={listDataSource}
-            setListDataSource={setListDataSource}
           />
         </div>
         <div className="tabs-container">
@@ -87,14 +134,22 @@ function App() {
               {
                 key: '1',
                 label: 'Paths',
-                children: <DataTable dataSource={dataSource} setDataSource={setDataSource} />
+                children: (
+                  <DataTable
+                    dataSource={dataSource}
+                    setDataSource={setDataSource}
+                    ActiveItem={ActiveItem}
+                  />
+                )
               },
               {
                 key: '2',
                 label: 'Options',
                 children: (
                   <OptionTab
-                    setBackupLoc={setBackupLoc}
+                    Data={Data}
+                    setData={setData}
+                    ActiveItem={ActiveItem}
                     BackupFunc={() => window.electron.copyFiles(dataSource, backupLoc)}
                   />
                 )
@@ -108,3 +163,28 @@ function App() {
 }
 
 export default App
+
+// [
+//   ({
+//     name: 'test',
+//     TableData: [
+//       { key: '1', path: 'sefsef' },
+//       { key: '2', path: 'sefsef' },
+//       { key: '3', path: 'sefsef' }
+//     ],
+//     config: {
+//       BackupLoc: 'qeqweqwe'
+//     }
+//   },
+//   {
+//     name: 'test2',
+//     TableData: [
+//       { key: '1', path: 'sefsef' },
+//       { key: '2', path: 'sefsef' },
+//       { key: '3', path: 'sefsef' }
+//     ],
+//     config: {
+//       BackupLoc: 'sefsefs'
+//     }
+//   })
+// ]
