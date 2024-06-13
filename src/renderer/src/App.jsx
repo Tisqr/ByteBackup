@@ -2,39 +2,32 @@ import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import DataTable from './components/DataTable'
 import GroupsList from './components/GroupsList'
-import NewModal from './components/Modal'
 import OptionTab from './components/OptionsTab'
 import { Tabs } from 'antd'
 import './assets/App.css'
 
 function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [dataSource, setDataSource] = useState([])
   const [backupLoc, setBackupLoc] = useState('')
   const [listDataSource, setListDataSource] = useState([])
   const [dataLoaded, setDataLoaded] = useState(false)
-  const [ModalValue, setModalValue] = useState('')
+  const [InputValue, setInputValue] = useState('')
   const [SelectValue, setSelectValue] = useState('path')
 
-  const showModal = () => {
-    setIsModalOpen(true)
-  }
-
   const addDataToTable = () => {
-    if (ModalValue !== '') {
+    if (InputValue !== '') {
       if (SelectValue === 'path') {
         setDataSource((prevDataSource) => {
           const newDataSource = [...prevDataSource]
           newDataSource.sort((a, b) => a.key - b.key)
           const lastKey = newDataSource.length ? newDataSource[newDataSource.length - 1].key : 0
-          const myObject = { key: String(Number(lastKey) + 1), path: ModalValue }
+          const myObject = { key: String(Number(lastKey) + 1), path: InputValue }
           return [...newDataSource, myObject]
         })
       } else {
-        setListDataSource((prevListDataSource) => [...prevListDataSource, ModalValue])
+        setListDataSource((prevListDataSource) => [...prevListDataSource, InputValue])
       }
     }
-    setIsModalOpen(false)
   }
 
   useEffect(() => {
@@ -71,7 +64,14 @@ function App() {
 
   return (
     <div className="app-container">
-      <Header BackupLoc={backupLoc} showModal={showModal} />
+      <Header
+        BackupLoc={backupLoc}
+        ModalValue={InputValue}
+        setModalValue={setInputValue}
+        SelectValue={SelectValue}
+        setSelectValue={setSelectValue}
+        handleOk={addDataToTable}
+      />
       <div className="content">
         <div className="groups-list-container">
           <GroupsList
@@ -81,15 +81,6 @@ function App() {
           />
         </div>
         <div className="tabs-container">
-          <NewModal
-            ModalValue={ModalValue}
-            setModalValue={setModalValue}
-            setIsModalOpen={setIsModalOpen}
-            isModalOpen={isModalOpen}
-            handleOk={addDataToTable}
-            SelectValue={SelectValue}
-            setSelectValue={setSelectValue}
-          />
           <Tabs
             defaultActiveKey="1"
             items={[
