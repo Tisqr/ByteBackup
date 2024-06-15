@@ -2,13 +2,14 @@ import { List } from 'antd'
 import PropTypes from 'prop-types'
 import { DeleteOutlined } from '@ant-design/icons'
 
-const GroupsList = ({ Data, setActiveItem, ListDataSource, setData }) => {
+const GroupsList = ({ Data, ActiveItem, setActiveItem, setData }) => {
   const handleDelete = (e) => {
+    let target = e.target.parentNode.parentNode.parentNode.parentNode.firstChild.textContent
     let initialData = [...Data]
-    initialData = initialData.filter(
-      (item) =>
-        item.name !== e.target.parentNode.parentNode.parentNode.parentNode.firstChild.textContent
-    )
+    initialData = initialData.filter((item) => item.name !== target)
+    if (target == ActiveItem) {
+      setActiveItem('')
+    }
     setData(initialData)
   }
 
@@ -21,12 +22,12 @@ const GroupsList = ({ Data, setActiveItem, ListDataSource, setData }) => {
       <List
         size="small"
         header={<div>Groups</div>}
-        dataSource={ListDataSource}
+        dataSource={Data}
         renderItem={(item) => (
           <List.Item>
             <div>
               <a href="#" onClick={handleActiveItemChange}>
-                {item}
+                {item.name}
               </a>
             </div>
             <div>
@@ -44,8 +45,8 @@ const GroupsList = ({ Data, setActiveItem, ListDataSource, setData }) => {
 GroupsList.propTypes = {
   Data: PropTypes.array.isRequired,
   setData: PropTypes.func.isRequired,
-  ListDataSource: PropTypes.array.isRequired,
-  setActiveItem: PropTypes.func.isRequired
+  setActiveItem: PropTypes.func.isRequired,
+  ActiveItem: PropTypes.string
 }
 
 export default GroupsList

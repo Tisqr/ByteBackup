@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.bytebackup.app
 productName: bytebackup
 directories:
   buildResources: build
@@ -32,13 +32,11 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: muhammadali360.github.io
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
-electronDownload:
-  mirror: https://npmmirror.com/mirrors/electron/
+# publish:
+#   provider: generic
+#   url: https://example.com/auto-updates

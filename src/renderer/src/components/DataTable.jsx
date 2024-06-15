@@ -3,10 +3,20 @@ import { DeleteOutlined } from '@ant-design/icons'
 
 import PropTypes from 'prop-types'
 
-const DataTable = ({ dataSource, setDataSource, ActiveItem }) => {
+const DataTable = ({ Data, setData, ActiveItem }) => {
   const handleDelete = (item) => {
-    const updatedData = dataSource.filter((dataItem) => dataItem.key !== item.key)
-    setDataSource(updatedData)
+    let updatedData = [...Data]
+
+    updatedData = updatedData.map((group) => {
+      if (group.name === ActiveItem) {
+        return {
+          ...group,
+          TableData: group.TableData.filter((table) => table.path !== item.path)
+        }
+      }
+      return group
+    })
+    setData(updatedData)
   }
 
   return (
@@ -14,7 +24,7 @@ const DataTable = ({ dataSource, setDataSource, ActiveItem }) => {
       <List
         size="small"
         header={ActiveItem ? ActiveItem : 'No Group Selected'}
-        dataSource={dataSource}
+        dataSource={Data.find((item) => item.name === ActiveItem)?.TableData || []}
         renderItem={(item) => (
           <List.Item>
             <div>{item.path}</div>
@@ -31,13 +41,8 @@ const DataTable = ({ dataSource, setDataSource, ActiveItem }) => {
 }
 
 DataTable.propTypes = {
-  dataSource: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      path: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  setDataSource: PropTypes.func.isRequired,
+  Data: PropTypes.array,
+  setData: PropTypes.func.isRequired,
   ActiveItem: PropTypes.string
 }
 

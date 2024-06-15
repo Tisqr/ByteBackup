@@ -8,15 +8,12 @@ import './assets/App.css'
 
 function App() {
   const [Data, setData] = useState([])
-  const [dataSource, setDataSource] = useState([])
-  const [backupLoc, setBackupLoc] = useState('')
-  const [listDataSource, setListDataSource] = useState([])
   const [dataLoaded, setDataLoaded] = useState(false)
   const [InputValue, setInputValue] = useState('')
   const [SelectValue, setSelectValue] = useState('path')
-  const [ActiveItem, setActiveItem] = useState('test')
+  const [ActiveItem, setActiveItem] = useState('')
 
-  const addDataToTable = () => {
+  const addData = () => {
     if (InputValue !== '') {
       setData((prevData) => {
         const newData = [...prevData]
@@ -30,15 +27,20 @@ function App() {
             const myObject = { key: String(Number(lastKey) + 1), path: InputValue }
             newData[activeItemIndex].TableData = [...newDataSource, myObject]
           }
-        } else if (SelectValue === 'group') {
-          let tempItem = {
-            name: InputValue,
-            TableData: [],
-            config: {
-              BackupLoc: ''
+        }
+        if (SelectValue == 'group') {
+          console.log('1')
+          if (!newData.find((item) => item.name === InputValue)) {
+            console.log('2')
+            let tempItem = {
+              name: InputValue,
+              TableData: [],
+              config: {
+                BackupLoc: ''
+              }
             }
+            newData.push(tempItem)
           }
-          newData.push(tempItem)
         }
         return newData
       })
@@ -62,70 +64,26 @@ function App() {
   }, [])
 
   useEffect(() => {
-    let tempData = []
-
-    async function fsetDataSource() {
-      for (const item of Data) {
-        if (item.name === ActiveItem) {
-          tempData = item.TableData
-        }
-      }
-      setDataSource(tempData)
-    }
-
-    fsetDataSource()
-
-    tempData = []
-
-    async function fsetListDataSource() {
-      for (const item of Data) {
-        tempData.push(item.name)
-      }
-      setListDataSource(tempData)
-    }
-
-    fsetListDataSource()
-
-    let tempbackuploc
-
-    async function fsetBackupLoc() {
-      for (const item of Data) {
-        if (item.name === ActiveItem) tempbackuploc = item.config.BackupLoc
-      }
-      setBackupLoc(tempbackuploc)
-    }
-
-    fsetBackupLoc()
-  }, [Data, ActiveItem])
-
-  useEffect(() => {
     async function setData() {
       window.electron.updateFile(JSON.stringify(Data))
     }
     if (dataLoaded) {
       setData()
-      console.log('ST')
     }
   }, [Data, dataLoaded])
 
   return (
     <div className="app-container">
       <Header
-        BackupLoc={backupLoc}
         ModalValue={InputValue}
         setModalValue={setInputValue}
         SelectValue={SelectValue}
         setSelectValue={setSelectValue}
-        handleOk={addDataToTable}
+        handleOk={addData}
       />
       <div className="content">
         <div className="groups-list-container">
-          <GroupsList
-            Data={Data}
-            setData={setData}
-            setActiveItem={setActiveItem}
-            ListDataSource={listDataSource}
-          />
+          <GroupsList Data={Data} setData={setData} setActiveItem={setActiveItem} />
         </div>
         <div className="tabs-container">
           <Tabs
@@ -134,13 +92,7 @@ function App() {
               {
                 key: '1',
                 label: 'Paths',
-                children: (
-                  <DataTable
-                    dataSource={dataSource}
-                    setDataSource={setDataSource}
-                    ActiveItem={ActiveItem}
-                  />
-                )
+                children: <DataTable Data={Data} setData={setData} ActiveItem={ActiveItem} />
               },
               {
                 key: '2',
@@ -150,7 +102,14 @@ function App() {
                     Data={Data}
                     setData={setData}
                     ActiveItem={ActiveItem}
-                    BackupFunc={() => window.electron.copyFiles(dataSource, backupLoc)}
+                    BackupFunc={() =>
+                      window.electron.copyFiles(
+                        Data.forEach((item) => (item.name == ActiveItem ? item.TableData : [])),
+                        Data.forEach((item) =>
+                          item.name == ActiveItem ? item.config.BackupLoc : ''
+                        )
+                      )
+                    }
                   />
                 )
               }
@@ -163,28 +122,3 @@ function App() {
 }
 
 export default App
-
-// [
-//   ({
-//     name: 'test',
-//     TableData: [
-//       { key: '1', path: 'sefsef' },
-//       { key: '2', path: 'sefsef' },
-//       { key: '3', path: 'sefsef' }
-//     ],
-//     config: {
-//       BackupLoc: 'qeqweqwe'
-//     }
-//   },
-//   {
-//     name: 'test2',
-//     TableData: [
-//       { key: '1', path: 'sefsef' },
-//       { key: '2', path: 'sefsef' },
-//       { key: '3', path: 'sefsef' }
-//     ],
-//     config: {
-//       BackupLoc: 'sefsefs'
-//     }
-//   })
-// ]

@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 const fs = require('node:fs').promises
-import path from 'node:path'
+const path = require('path')
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -11,7 +11,7 @@ function createWindow() {
     minHeight: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon: icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
@@ -28,8 +28,6 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  // HMR for renderer based on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -59,7 +57,7 @@ const handleGetFile = async () => {
   }
 }
 
-const handleCopy = async (dataSource, backupLoc) => {
+const handleCopy = async (dataSource, backupLoc, excludePatterns) => {
   const copyItem = async (src, dest) => {
     try {
       const stats = await fs.lstat(src)
@@ -70,10 +68,14 @@ const handleCopy = async (dataSource, backupLoc) => {
         }
         const items = await fs.readdir(src)
         for (const item of items) {
-          await copyItem(join(src, item), join(dest, item))
+          await copyItem(path.join(src, item), path.join(dest, item))
         }
       } else {
-        await fs.copyFile(src, dest)
+        if (excludePatterns.some((pattern) => new RegExp(pattern).test(src))) {
+          console.log(`Ignoring file: ${src}`)
+        } else {
+          await fs.copyFile(src, dest)
+        }
       }
     } catch (error) {
       console.error(`Failed to copy ${src} to ${dest}:`, error)
@@ -82,7 +84,7 @@ const handleCopy = async (dataSource, backupLoc) => {
 
   for (const item of dataSource) {
     const fileName = path.basename(item.path)
-    const destination = join(backupLoc, fileName)
+    const destination = path.join(backupLoc, fileName)
 
     try {
       await copyItem(item.path, destination)
@@ -93,7 +95,7 @@ const handleCopy = async (dataSource, backupLoc) => {
 }
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.bytebackup')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

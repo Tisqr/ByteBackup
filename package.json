@@ -2,7 +2,7 @@
   "name": "bytebackup",
   "version": "1.0.0",
   "description": "A Simple File Backup Utility.",
-  "main": "./out/main/index.js",
+  "main": "./src/main/index.js",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
@@ -18,9 +18,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
-    "antd": "^5.17.4",
-    "electron-store": "^9.0.0",
-    "sqlite3": "^5.1.7"
+    "antd": "^5.17.4"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
