@@ -55,7 +55,7 @@ const handleGetFile = async () => {
   }
 }
 
-const handleCopy = async (dataSource, backupLoc, excludePatterns) => {
+const handleCopy = async (dataSource, backupLoc) => {
   const copyItem = async (src, dest) => {
     try {
       const stats = await fs.lstat(src)
@@ -66,14 +66,10 @@ const handleCopy = async (dataSource, backupLoc, excludePatterns) => {
         }
         const items = await fs.readdir(src)
         for (const item of items) {
-          await copyItem(path.join(src, item), path.join(dest, item))
+          await copyItem(join(src, item), join(dest, item))
         }
       } else {
-        if (excludePatterns.some((pattern) => new RegExp(pattern).test(src))) {
-          console.log(`Ignoring file: ${src}`)
-        } else {
-          await fs.copyFile(src, dest)
-        }
+        await fs.copyFile(src, dest)
       }
     } catch (error) {
       console.error(`Failed to copy ${src} to ${dest}:`, error)
@@ -82,7 +78,7 @@ const handleCopy = async (dataSource, backupLoc, excludePatterns) => {
 
   for (const item of dataSource) {
     const fileName = path.basename(item.path)
-    const destination = path.join(backupLoc, fileName)
+    const destination = join(backupLoc, fileName)
 
     try {
       await copyItem(item.path, destination)

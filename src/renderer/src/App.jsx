@@ -102,14 +102,14 @@ function App() {
                     Data={Data}
                     setData={setData}
                     ActiveItem={ActiveItem}
-                    BackupFunc={() =>
-                      window.electron.copyFiles(
-                        Data.forEach((item) => (item.name == ActiveItem ? item.TableData : [])),
-                        Data.forEach((item) =>
-                          item.name == ActiveItem ? item.config.BackupLoc : ''
-                        )
+                    BackupFunc={() => {
+                      const filesToCopy = Data.filter((item) => item.name === ActiveItem).flatMap(
+                        (item) => item.TableData
                       )
-                    }
+                      const backupLocation =
+                        Data.find((item) => item.name === ActiveItem)?.config.BackupLoc || ''
+                      window.electron.copyFiles(filesToCopy, backupLocation)
+                    }}
                   />
                 )
               }
