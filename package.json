@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A Simple File Backup Utility.",
   "main": "./out/main/index.js",
+  "author": "muhammadali360.github.io",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
