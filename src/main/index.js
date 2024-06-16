@@ -36,7 +36,7 @@ function createWindow() {
 }
 
 const handleUpdateFile = async (data) => {
-  const appPath = app.getAppPath()
+  const appPath = app.getPath('userData')
   const filePath = path.join(appPath, 'db.json')
   try {
     fs.writeFile(filePath, data)
@@ -47,7 +47,7 @@ const handleUpdateFile = async (data) => {
 
 const handleGetFile = async () => {
   try {
-    const data = await fs.readFile(path.join(app.getAppPath(), 'db.json'), 'utf8')
+    const data = await fs.readFile(path.join(app.getPath('userData'), 'db.json'), 'utf8')
     return data
   } catch (error) {
     console.error('Error reading file:', error)
