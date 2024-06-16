@@ -33,8 +33,6 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-
-  mainWindow.webContents.openDevTools()
 }
 
 const handleUpdateFile = async (data) => {
